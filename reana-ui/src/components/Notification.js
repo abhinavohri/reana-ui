@@ -2,23 +2,16 @@
   -*- coding: utf-8 -*-
 
   This file is part of REANA.
-  Copyright (C) 2020, 2022, 2023 CERN.
+  Copyright (C) 2020, 2022, 2023, 2026 CERN.
 
   REANA is free software; you can redistribute it and/or modify it
   under the terms of the MIT License; see LICENSE file for more details.
 */
 
-import { useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { Container, Message, Transition } from "semantic-ui-react";
 import PropTypes from "prop-types";
 
-import { clearNotification } from "~/actions";
-import { getNotification } from "~/selectors";
-
 import styles from "./Notification.module.scss";
-
-const AUTO_CLOSE_TIMEOUT = 16000;
 
 export default function Notification({
   icon,
@@ -28,41 +21,26 @@ export default function Notification({
   error,
   success,
   warning,
+  onDismiss,
 }) {
-  const dispatch = useDispatch();
-  const notification = useSelector(getNotification);
-  const timer = useRef(null);
-
-  const hide = () => dispatch(clearNotification);
-  const visible = message || notification ? true : false;
-  const actionIcon = notification?.isError
+  const actionIcon = error
     ? "warning sign"
-    : notification?.isWarning
+    : warning
       ? "warning circle"
       : "info circle";
 
-  if (closable && visible) {
-    clearTimeout(timer.current);
-    timer.current = setTimeout(() => hide(), AUTO_CLOSE_TIMEOUT);
-  }
   return (
-    <Transition visible={visible} duration={300}>
+    <Transition visible={!!message} duration={300}>
       <Container text className={styles.container}>
         <Message
           icon={icon || actionIcon}
-          header={header || notification?.header}
-          content={message || notification?.message}
-          onDismiss={closable ? hide : null}
+          header={header}
+          content={message}
+          onDismiss={closable ? onDismiss : null}
           size="small"
-          error={error || (notification && notification.isError)}
-          success={
-            success ||
-            (notification && !notification.isError && !notification.isWarning)
-          }
-          warning={
-            warning ||
-            (notification && notification.isWarning && !notification.isError)
-          }
+          error={error}
+          success={success}
+          warning={warning}
         />
       </Container>
     </Transition>
@@ -77,6 +55,7 @@ Notification.propTypes = {
   error: PropTypes.bool,
   success: PropTypes.bool,
   warning: PropTypes.bool,
+  onDismiss: PropTypes.func,
 };
 
 Notification.defaultProps = {
@@ -87,4 +66,5 @@ Notification.defaultProps = {
   error: false,
   success: false,
   warning: false,
+  onDismiss: null,
 };
