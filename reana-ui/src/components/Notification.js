@@ -17,7 +17,6 @@ export default function Notification({
   icon,
   header,
   message,
-  closable,
   error,
   success,
   warning,
@@ -30,13 +29,13 @@ export default function Notification({
       : "info circle";
 
   return (
-    <Transition visible={!!message} duration={300}>
+    <Transition visible={!!(header || message)} duration={300}>
       <Container text className={styles.container}>
         <Message
           icon={icon || actionIcon}
           header={header}
           content={message}
-          onDismiss={closable ? onDismiss : null}
+          onDismiss={onDismiss}
           size="small"
           error={error}
           success={success}
@@ -51,7 +50,6 @@ Notification.propTypes = {
   icon: PropTypes.string,
   header: PropTypes.string,
   message: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-  closable: PropTypes.bool,
   error: PropTypes.bool,
   success: PropTypes.bool,
   warning: PropTypes.bool,
@@ -62,7 +60,6 @@ Notification.defaultProps = {
   icon: null,
   header: null,
   message: null,
-  closable: true,
   error: false,
   success: false,
   warning: false,
